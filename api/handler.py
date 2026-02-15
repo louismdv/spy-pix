@@ -81,7 +81,7 @@ class handler(BaseHTTPRequestHandler):
 		if email_recipient == "unknown" or email_title == "unknown":
 			print("[DEBUG] Request filtered: missing recipient or title parameters", file=sys.stderr)
 		
-		elif email_recipient != "unknown" and email_title != "unknown":
+		else:
 			print(f"[INFO] Valid request, processing email open", file=sys.stderr)
 			email_key = f"email:{email_recipient}:{email_title}"
 
@@ -120,7 +120,7 @@ class handler(BaseHTTPRequestHandler):
 				if now < activation_time:
 					time_remaining = (activation_time - now).total_seconds()
 					print(f"[INFO] Not activated yet. {time_remaining:.0f} seconds remaining", file=sys.stderr)
-				if email_key_data["count"]>3:
+				elif email_key_data["count"]>2:
 					print(f"[INFO] Open count {email_key_data['count']} exceeds threshold, skipping notification", file=sys.stderr)
 				# If past activation time - increment counter and notify
 				else:
