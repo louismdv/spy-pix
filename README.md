@@ -1,5 +1,28 @@
 # Vercel KV Setup Instructions
 
+![Alt text](./system_design.png)
+
+Inspired by [collinsmc23/spy-pixel](https://github.com/collinsmc23/spy-pixel)
+
+## Step 0: Initialize vercel project setup
+Install vercel CLI:
+```
+npm i -g vercel
+vercel login
+```
+Create node project:
+```
+mkdir spy-pix
+cd spy-pix
+npm init -y
+```
+Clone project
+
+Deploy to vercel:
+```
+vercel
+```
+
 ## Step 1: Create a Vercel KV Database
 
 1. Go to your Vercel dashboard: https://vercel.com/dashboard
@@ -44,19 +67,19 @@ Embed this in an email as an image tag:
 ## How It Works
 
 ### First Load (Tracker Activation)
-- When the pixel is first loaded, a "Tracker Activated" notification is sent immediately
-- An activation delay of 30 seconds is set (configurable via `ACTIVATION_DELAY_MINUTES`)
-- The email is stored in Vercel KV with count=0 and the activation timestamp
+- When the pixel is first loaded, a "Tracker Activated" notification is sent immediately via ntfy.sh
+- An activation delay of 30 seconds is set (configurable via `ACTIVATION_DELAY_MINUTES`) to avoid getting spammed while setting up the pixel inside the email.
+- The request is stored inside Vercel KV with a counter initialized to 0 and an activation timestamp used to check if the 30seconds delay are past
 
 ### During Activation Delay (0-30 seconds)
 - Any opens during this period are logged but ignored
-- This prevents counting automated email client previews or pre-fetching
+- This prevents counting automated email client previews or pre-fetching by email provider (Gmail, Outlook, ...) which check the image actually exists before loading it to the email
 - You'll see logs showing time remaining until activation
 
 ### After Activation (30+ seconds)
-- First open after activation → "First Open" notification (count=1)
+- First request after activation delay is considered the first email opening → "First Open" notification (count=1)
 - Subsequent opens → "Reopened" notifications (count=2, 3, etc.)
-- After 3+ opens, notifications stop to prevent spam
+- After 3+ opens, notifications stop to prevent spam on ntfy.sh
 
 ### Data Storage
 - Each email is tracked by a unique key: `email:{recipient}:{title}`
@@ -67,6 +90,6 @@ Embed this in an email as an image tag:
 - You'll receive notifications via ntfy.sh when emails are opened
 
 ### Notification Types
-1. **Tracker Activated** (sparkle ✨) - Pixel first embedded/loaded
+1. **Tracker Activated** (sparkle ❇️) - Pixel first embedded/loaded in email
 2. **First Open** (folder 📂) - First legitimate open after 30s delay
 3. **Reopened** (arrows 🔄) - Subsequent opens (up to 3 total)
